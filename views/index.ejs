@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chessboard-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+        }
+
+        .chessboard {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            grid-template-rows: repeat(8, minmax(0, 1fr));
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            transform: rotate(0deg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .square.light {
+            background-color: #f0d9b5;
+        }
+
+        .square.dark {
+            background-color: #b58863;
+        }
+
+        .piece {
+            font-size: 46px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .piece:hover {
+            transform: scale(1.1);
+        }
+
+        .piece.white {
+            color: white;
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1));
+        }
+
+        .piece.black {
+            color: black;
+        }
+
+        .piece.draggable {
+            cursor: grab;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .flipped {
+            transform: rotate(180deg);
+        }
+
+        .flipped .piece {
+            transform: rotate(180deg);
+        }
+
+        .rank-label,
+        .file-label {
+            position: absolute;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d1d5db;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        }
+
+        .rank-label {
+            left: -2rem;
+            transform: translateY(-50%);
+            top: 50%;
+        }
+
+        .file-label {
+            bottom: -2rem;
+            transform: translateX(-50%);
+            left: 50%;
+        }
+
+        .move-number {
+            font-weight: bold;
+            color: #f3f4f6;
+            margin-right: 0.5rem;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+</head>
+
+<body class="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white min-h-screen flex flex-col">
+
+    <div id="start-game-overlay" class="fixed inset-0 bg-zinc-950 bg-opacity-90 flex items-center justify-center z-50">
+        <button id="start-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-xl transition-all duration-300">
+            Click to Start
+        </button>
+    </div>
+
+    <header
+        class="w-full px-6 py-4 backdrop-blur-md bg-zinc-950/80 shadow-lg flex flex-wrap justify-between items-center text-sm md:text-base font-medium">
+        <div>👤 Logged in as: <span id="username-display" class="text-green-400">Guest</span></div>
+        <div id="opponent">🧑‍🤝‍🧑 Opponent: <span id="opponent-name" class="text-yellow-400">Connecting...</span>
+        </div>
+        <div>🏠 Room: <span id="room-display" class="text-yellow-400">Connecting...</span></div>
+        <div>👀 Spectators: <span id="spectator-count" class="text-yellow-400">0</span></div>
+        <div id="turn">🎯 Turn: <span id="turn-indicator" class="text-yellow-400">Your turn</span></div>
+    </header>
+
+    <main class="flex-grow flex flex-col md:flex-row items-center justify-center p-4 gap-8">
+
+        <div class="chessboard-container relative">
+            <div class="chessboard bg-zinc-700"></div>
+            <div id="rank-labels"
+                class="absolute inset-y-0 left-0 w-8 flex flex-col justify-around text-center text-lg font-semibold">
+            </div>
+            <div id="file-labels"
+                class="absolute inset-x-0 bottom-0 h-8 flex justify-around text-center text-lg font-semibold"></div>
+        </div>
+
+        <div class="w-full md:w-1/3 max-w-md bg-zinc-950 rounded-xl shadow-lg p-6 space-y-4 h-[500px] flex flex-col">
+            <div id="game-status" class="text-center text-xl font-bold p-2 rounded-lg transition-colors"></div>
+
+            <div class="flex-grow overflow-y-auto space-y-2 p-2 rounded-lg bg-zinc-900 custom-scrollbar">
+                <h2 class="text-lg font-bold sticky top-0 bg-zinc-900 p-2 -m-2 z-10">Game Moves</h2>
+                <div id="moves-list" class="flex flex-wrap gap-2 text-sm">
+                </div>
+            </div>
+
+            <div id="spectator-info" class="bg-zinc-900 text-white rounded-lg shadow-lg p-4 space-y-2 hidden">
+                <h2 class="text-xl font-semibold text-center">Spectator View</h2>
+                <p>🧑 Player 1(White): <span id="player1-name" class="text-green-400">-</span></p>
+                <p>🧑 Player 2(Black): <span id="player2-name" class="text-blue-400">-</span></p>
+                <p>🎯 Turn: <span id="spectator-turn" class="text-yellow-400">-</span></p>
+                <p><span id="won" class="text-yellow-400"></span></p>
+            </div>
+
+            <audio id="move-self" src="/sounds/move-self.mp3" preload="auto"></audio>
+            <audio id="move-opponent" src="/sounds/move-opponent.mp3" preload="auto"></audio>
+            <audio id="illegal" src="/sounds/illegal.mp3" preload="auto"></audio>
+            <audio id="game-start" src="/sounds/game-start.mp3" preload="auto"></audio>
+            <audio id="game-end" src="/sounds/game-end.mp3" preload="auto"></audio>
+            <audio id="promote" src="/sounds/promote.mp3" preload="auto"></audio>
+            <audio id="capture" src="/sounds/capture.mp3" preload="auto"></audio>
+            <audio id="check" src="/sounds/move-check.mp3" preload="auto"></audio>
+
+        </div>
+
+    </main>
+
+
+    <div id="game-over-modal"
+        class="fixed inset-0 bg-zinc-950 bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div
+            class="bg-zinc-900 rounded-2xl shadow-xl p-8 w-full max-w-sm text-center relative transform transition-all duration-500 scale-95 opacity-0">
+
+            <button id="close-modal-btn"
+                class="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="mb-6">
+                <h2 id="modal-title" class="text-4xl font-extrabold text-green-500 animate-pulse mb-2">You Won!</h2>
+                <p id="modal-message" class="text-zinc-300 text-lg">Congratulations, you have defeated your opponent!
+                </p>
+            </div>
+
+            <div id="modal-icon" class="text-6xl mb-4 animate-scale-up">
+                <span class="text-green-500">👑</span>
+            </div>
+
+            <button id="playAgainBtn"
+                class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full transition duration-300 transform hover:scale-105 cursor-pointer">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+        integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
+        integrity="sha512-xRllwz2gdZciIB+AkEbeq+gVhX8VB8XsfqeFbUh+SzHlN96dEduwtTuVuc2u9EROlmW9+yhRlxjif66ORpsgVA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/chessgame.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const username = params.get("username") || "Guest";
+        document.getElementById("username-display").textContent = username;
+    </script>
+</body>
+
+</html>

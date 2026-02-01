@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess.com | Welcome</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Toastify CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+</head>
+<body class="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white font-sans">
+
+  <div class="flex items-center justify-center h-screen">
+    <div class="bg-zinc-950 rounded-xl shadow-lg p-8 w-full max-w-md text-center relative">
+
+      <!-- Chess Logo -->
+      <img
+        src="Chess\OIP.jpg"
+        alt=""
+        class="w-40 h-40 mx-auto mb-4 animate-bounce"
+      />
+
+      <!-- Title -->
+      <h1 class="text-3xl font-bold mb-2">Welcome to Chess.com</h1>
+      <p class="text-zinc-400 mb-6">Play. Learn. Compete. Master the game.</p>
+
+      <!-- Buttons -->
+      <div class="flex flex-col gap-4">
+        <a href="/user/login" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full transition duration-300">
+          Login
+        </a>
+        <a href="/user/register" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-full transition duration-300">
+          Join Now
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-xs text-zinc-500 mt-6">© 2025 Chess.com. All rights reserved.</p>
+    </div>
+  </div>
+
+  <!-- Toastify JS -->
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <!-- Optional: Welcome Toast -->
+  <script>
+    Toastify({
+      text: "Welcome to Chess.com!",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#4CAF50",
+    }).showToast();
+  </script>
+</body>
+</html>

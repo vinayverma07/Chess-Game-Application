@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chessboard {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            grid-template-rows: repeat(8, minmax(0, 1fr));
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+            transform: rotate(0deg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .square.light {
+            background-color: #f0d9b5;
+        }
+
+        .square.dark {
+            background-color: #b58863;
+        }
+
+        .piece {
+            font-size: 46px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .piece:hover {
+            transform: scale(1.1);
+        }
+
+        .piece.white {
+            color: white;
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1));
+        }
+
+        .piece.black {
+            color: black;
+        }
+
+        .piece.draggable {
+            cursor: grab;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .flipped {
+            transform: rotate(180deg);
+        }
+
+        .flipped .piece {
+            transform: rotate(180deg);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+</head>
+
+<body class="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header
+        class="w-full px-6 py-4 backdrop-blur-md bg-zinc-950/80 shadow-lg flex flex-wrap justify-between items-center text-sm md:text-base font-medium">
+        <div>👤 Logged in as: <span id="username-display" class="text-green-400">Guest</span></div>
+        <div id="opponent">🧑‍🤝‍🧑 Opponent: <span id="opponent-name" class="text-yellow-400">Connecting...</span>
+        </div>
+        <div>🏠 Room: <span id="room-display" class="text-yellow-400">Connecting...</span></div>
+        <div>👀 Spectators: <span id="spectator-count" class="text-yellow-400">0</span></div>
+        <div id="turn">🎯 Turn: <span id="turn-indicator" class="text-yellow-400">Your turn</span></div>
+    </header>
+
+    <!-- Chessboard -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="chessboard bg-zinc-700"></div>
+
+        <!-- INFO: Spectator-box -->
+        <div id="spectator-info" class="hidden bg-zinc-950 text-white rounded-lg shadow-lg p-4 w-104 h-104 space-y-4 m-10">
+            <h2 class="text-2xl font-semibold text-center mb-2">Spectator View</h2>
+            <div >
+                <p class="text-xl">🧑 Player 1(White): <span id="player1-name" class="text-green-400 text-xl">-</span></p>
+                <p class="text-xl">🧑 Player 2(Black): <span id="player2-name" class="text-blue-400 text-xl">-</span></p>
+                <p class="text-xl">🎯 Turn: <span id="spectator-turn" class="text-yellow-400 text-xl">-</span></p>
+                <p ><span id="won" class="text-yellow-400 text-xl ">-</span></p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+        integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
+        integrity="sha512-xRllwz2gdZciIB+AkEbeq+gVhX8VB8XsfqeFbUh+SzHlN96dEduwtTuVuc2u9EROlmW9+yhRlxjif66ORpsgVA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="/js/chessgame.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const username = params.get("username") || "Guest";
+        document.getElementById("username-display").textContent = username;
+    </script>
+</body>
+
+</html>

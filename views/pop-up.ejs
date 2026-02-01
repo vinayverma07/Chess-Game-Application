@@ -1,0 +1,23 @@
+<div id="game-over-modal" class="fixed inset-0 bg-zinc-950 bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-zinc-900 rounded-2xl shadow-xl p-8 w-full max-w-sm text-center relative transform transition-all duration-500 scale-95 opacity-0">
+
+        <button id="close-modal-btn" class="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div class="mb-6">
+            <h2 id="modal-title" class="text-4xl font-extrabold text-green-500 animate-pulse mb-2">You Won!</h2>
+            <p id="modal-message" class="text-zinc-300 text-lg">Congratulations, you have defeated your opponent!</p>
+        </div>
+
+        <div id="modal-icon" class="text-6xl mb-4 animate-scale-up">
+            <span class="text-green-500">👑</span>
+        </div>
+
+        <a href="/" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full transition duration-300 transform hover:scale-105">
+            Play Again
+        </a>
+    </div>
+</div>

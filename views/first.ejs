@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess.com | Welcome</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+</head>
+
+<body class="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white font-sans">
+    <!-- Top Bar with Username -->
+    <div class="w-full py-4 px-6 bg-zinc-950 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold">Chess.com</h1>
+        <div class="text-green-400 font-semibold">
+            Logged in as: <span id="username">Guest</span>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-zinc-950 rounded-xl shadow-lg p-8 w-full max-w-md text-center relative">
+            <div class="mt-8 text-left">
+                <!-- Create Room Section -->
+                <h2 class="text-xl font-semibold mb-2">Create a Room</h2>
+                <button id="create-room-btn"
+                    class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-full mb-2">
+                    Generate Room ID
+                </button>
+                <div id="room-id-display" class="text-sm text-zinc-300 mb-2"></div>
+                <button id="copy-room-id"
+                    class="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded text-xs hidden">
+                    Copy Room ID
+                </button>
+
+                <!-- Join Room Section -->
+                <h2 class="text-xl font-semibold mt-6 mb-2">Join a Room</h2>
+                <!-- <input type="text" id="join-username" placeholder="Enter your name"
+                    class="w-full p-2 mb-2 rounded bg-zinc-800 text-white border border-zinc-700" /> -->
+                <input type="text" id="join-room-id" placeholder="Enter Room ID"
+                    class="w-full p-2 mb-2 rounded bg-zinc-800 text-white border border-zinc-700" />
+                <button id="join-room-btn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                    Join Room
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Optional: Welcome Toast -->
+    <script>
+        const createRoomBtn = document.getElementById("create-room-btn");
+        const roomIdDisplay = document.getElementById("room-id-display");
+        const copyRoomIdBtn = document.getElementById("copy-room-id");
+        const joinRoomBtn = document.getElementById("join-room-btn");
+        const loggedInUsername = "<%= username %>";
+
+        // Set username
+        document.getElementById("username").textContent = loggedInUsername;
+
+        // Show toast
+        Toastify({
+            text: `Welcome, ${loggedInUsername}! You are now logged in.`,
+            duration: 4000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#22c55e",
+            stopOnFocus: true,
+        }).showToast();
+
+        // Generate UUID
+        const generateRoomId = () => {
+            return crypto.randomUUID();
+        };
+
+        createRoomBtn.addEventListener("click", () => {
+            const roomId = generateRoomId();
+            roomIdDisplay.textContent = `Room ID: ${roomId}`;
+            roomIdDisplay.dataset.roomId = roomId;
+            copyRoomIdBtn.classList.remove("hidden");
+
+            Toastify({
+                text: "Room ID generated!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#4CAF50",
+            }).showToast();
+        });
+
+        copyRoomIdBtn.addEventListener("click", () => {
+            const roomId = roomIdDisplay.dataset.roomId;
+            navigator.clipboard.writeText(roomId).then(() => {
+                Toastify({
+                    text: "Room ID copied to clipboard!",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#2196F3",
+                }).showToast();
+            });
+        });
+
+        joinRoomBtn.addEventListener("click", () => {
+            //const username = document.getElementById("join-username").value.trim();
+            const roomId = document.getElementById("join-room-id").value.trim();
+
+            if (!loggedInUsername || !roomId) {
+                Toastify({
+                    text: "Please enter both username and room ID.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#e31515ff",
+                }).showToast();
+                return;
+            }
+
+            // Redirect to index page with query params
+            window.location.href = `/index?username=${encodeURIComponent(loggedInUsername)}&room=${encodeURIComponent(roomId)}`;
+           // window.location.href = `/index?username=${encodeURIComponent(loggedInUsername)}`;
+        });
+    </script>
+
+</body>
+
+</html>
